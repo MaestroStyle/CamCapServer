@@ -26,7 +26,7 @@ public:
     ~CameraCapture();
 
 private:
-    CaptureEngine *video_capture = nullptr;
+    CaptureEngine *capture_engine = nullptr;
     QThread *thread_for_capture = nullptr;
 
     QGridLayout *layout = nullptr;

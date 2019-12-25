@@ -16,7 +16,7 @@ CameraCapture::CameraCapture(QWidget *parent)
     layout->addWidget(combobox_list_cameras);
 
     preview_camera_capture = new QLabel;
-    layout->addWidget(preview_camera_capture, 0, 0);
+    layout->addWidget(preview_camera_capture);
 
     QList<QCameraInfo> list_cameras_info = QCameraInfo::availableCameras();
 
@@ -48,20 +48,23 @@ CameraCapture::~CameraCapture()
 }
 void CameraCapture::startCapture(qint32 camera_id){
    thread_for_capture = new QThread;
-   video_capture = new CaptureEngine(camera_id);
-   video_capture->moveToThread(thread_for_capture);
+   capture_engine = new CaptureEngine(camera_id);
+   capture_engine->moveToThread(thread_for_capture);
 
-   QObject::connect(video_capture, &CaptureEngine::frameCaptured, this, &CameraCapture::displayFrame, Qt::DirectConnection);
-   QObject::connect(thread_for_capture, &QThread::started, video_capture, &CaptureEngine::startCapture);
-   QObject::connect(this, &CameraCapture::captureStopped, video_capture, &CaptureEngine::stopCapture, Qt::DirectConnection);
+   QObject::connect(capture_engine, &CaptureEngine::frameCaptured, this, &CameraCapture::displayFrame, Qt::DirectConnection);
+   QObject::connect(thread_for_capture, &QThread::started, capture_engine, &CaptureEngine::startCapture);
+   QObject::connect(this, &CameraCapture::captureStopped, capture_engine, &CaptureEngine::stopCapture, Qt::DirectConnection);
 
    thread_for_capture->start();
 }
 
 void CameraCapture::displayFrame(cv::Mat& frame){
+    cv::Mat copy_frame(frame);
+    cv::resize(frame, copy_frame, cv::Size(320, 240));
+    cv::cvtColor(copy_frame, copy_frame, cv::COLOR_BGR2RGB);
     QPixmap pix_frame;
 //    pix_frame.loadFromData(frame.data, frame.total() * 3, "BMP");
-    QImage img((uchar*) frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+    QImage img((uchar*) copy_frame.data, copy_frame.cols, copy_frame.rows, copy_frame.step, QImage::Format_RGB888);
 //    pix_frame.fromImage(img);
     preview_camera_capture->setPixmap(/*pix_frame*/QPixmap::fromImage(img, Qt::ColorOnly));
 }
