@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,6 +16,7 @@ LIBS += opencv_world412d.lib
 
 
 SOURCES += \
+    CaptureEngine.cpp \
     Coder.cpp \
     Transmitter.cpp \
     main.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 
 HEADERS += \
     CameraCapture.h \
+    CaptureEngine.h \
     Coder.h \
     Transmitter.h
 
