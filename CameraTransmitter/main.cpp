@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     CameraCapture w;
     w.show();
-    w.startCapture(0);
+//    w.startCapture(0);
 //    cv::VideoCapture *cap = new cv::VideoCapture(0);
 ////    cap.open(0);
 //    cv::Mat frame;

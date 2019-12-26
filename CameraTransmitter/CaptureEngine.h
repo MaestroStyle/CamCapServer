@@ -12,19 +12,18 @@ class CaptureEngine : public QObject
 {
     Q_OBJECT
 public:
-    explicit CaptureEngine(qint32 camera_id, QObject *parent = nullptr);
+    explicit CaptureEngine(qint32 camera_id = 0, QObject *parent = nullptr);
     ~CaptureEngine();
-
-//    cv::VideoCapture *video_capture = nullptr;
+    bool isProcess();
+private:
     cv::VideoCapture video_capture;
     bool process = false;
     qint32 id_cur_camera = 0;
 signals:
     void frameCaptured(cv::Mat& frame);
-    void nextFrameCaptured();
+    void processStopped();
 public slots:
     void startCapture();
-    void captureFrame();
     void stopCapture();
     void setIdCamera(qint32 camera_id);
     qint32 getIdCamera();

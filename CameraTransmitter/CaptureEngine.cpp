@@ -4,65 +4,42 @@
 CaptureEngine::CaptureEngine(qint32 camera_id, QObject *parent) : QObject(parent)
 {
     id_cur_camera = camera_id;
-    QObject::connect(this, &CaptureEngine::nextFrameCaptured, this, &CaptureEngine::captureFrame);
 }
 CaptureEngine::~CaptureEngine(){
-//    video_capture->release();
+
+}
+bool CaptureEngine::isProcess(){
+    return process;
 }
 void CaptureEngine::startCapture(){
     process = true;
-//    video_capture = new cv::VideoCapture(0/*id_cur_camera*/);
-//    video_capture.open(-1);
-////    if(video_capture->isOpened()){
-//    if(video_capture.isOpened()){
-//#ifdef DEBUG_MODE
-//        qDebug(QString(QString(__FUNCTION__) + QString(" Error! Unable to open camera!")).toUtf8());
-//#endif
-//        stopCapture();
-//        return;
-//    }
-//    video_capture->open(id_cur_camera);
-    captureFrame();
-}
-void CaptureEngine::captureFrame(){
-    if(process){
-        cv::Mat frame;
-//        video_capture->read(frame);
-        video_capture.open(0);
+    cv::Mat frame;
+    video_capture.open(id_cur_camera);
+    while(process){
         video_capture.read(frame);
         if(frame.empty()){
 #ifdef DEBUG_MODE
             qDebug(QString(QString(__FUNCTION__) + QString(" Error! Blank frame grabbed!")).toUtf8());
 #endif
             stopCapture();
-            return;
+//            or continue;
         }
         emit frameCaptured(frame);
-        emit nextFrameCaptured();
+#ifdef DEBUG_MODE
+        static quint32 num_frame_for = 0;
+        qDebug(QString(QString(__FUNCTION__) + QString(" %1").arg(process)).toUtf8());
+        qDebug(QString(QString(__FUNCTION__) + QString(" frame %1").arg(num_frame_for++)).toUtf8());
+#endif
     }
-//    video_capture.open(id_cur_camera);
-//    cv::Mat frame;
-
-//    while(process){
-//        video_capture.read(frame);
-//        if(frame.empty()){
-//#ifdef DEBUG_MODE
-//            qDebug(QString(QString(__FUNCTION__) + QString(" Error! Blank frame grabbed!")).toUtf8());
-//#endif
-//            emit frameCaptured(frame);
-//            emit nextFrameCaptured();
-//            stopCapture();
-//            return;
-//        }
-//    }
+    video_capture.release();
+    emit processStopped();
+    thread()->quit();
 }
 void CaptureEngine::stopCapture(){
     process = false;
 }
 void CaptureEngine::setIdCamera(qint32 camera_id){
     id_cur_camera = camera_id;
-//    video_capture->open(id_cur_camera);
-    video_capture.open(id_cur_camera);
 }
 qint32 CaptureEngine::getIdCamera(){
     return id_cur_camera;
