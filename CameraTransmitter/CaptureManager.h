@@ -1,30 +1,30 @@
-#ifndef CAMERACAPTURE_H
-#define CAMERACAPTURE_H
+#ifndef CAPTUREMANAGER_H
+#define CAPTUREMANAGER_H
 
 #include <QWidget>
 #include <QGridLayout>
 #include <QLabel>
 #include <QComboBox>
-#include <QPushButton>
+//#include <QPushButton>
 
 #include <QCameraInfo>
-#include <QThread>
+//#include <QThread>
 //#include <QCamera>
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/videoio.hpp>
+//#include <opencv2/videoio.hpp>
 
-#include "CaptureEngine.h"
+//#include "CaptureEngine.h"
 
 #define DEBUG_MODE
 
-class CameraCapture : public QWidget
+class CaptureManager : public QWidget
 {
     Q_OBJECT
 
 public:
-    CameraCapture(QWidget *parent = nullptr);
-    ~CameraCapture();
+    CaptureManager(QWidget *parent = nullptr);
+    ~CaptureManager();
 
 private:
     CaptureEngine capture_engine;
@@ -34,13 +34,16 @@ private:
     QComboBox *combobox_list_cameras = nullptr;
     QLabel *debug_info = nullptr;
     QLabel *preview_camera_capture = nullptr;
-    QPushButton *start_capture_button = nullptr;
-    QPushButton *stop_capture_button = nullptr;
+//    QPushButton *start_capture_button = nullptr;
+//    QPushButton *stop_capture_button = nullptr;
 
     quint32 width_preview = 0;
     quint32 height_preview = 0;
 
 signals:
+    void captureStarted(qint32 camera_id);
+    void captureStopped();
+    void captureChanged(qint32 camera_id);
     void frameCaptured(cv::Mat& frame);
 public slots:
     void startCapture();
@@ -48,4 +51,4 @@ public slots:
     void displayFrame(cv::Mat& frame);
     void clearPreview();
 };
-#endif // CAMERACAPTURE_H
+#endif // CAPTUREMANAGER_H

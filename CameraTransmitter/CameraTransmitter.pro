@@ -17,14 +17,14 @@ LIBS += opencv_world412d.lib
 
 SOURCES += \
     CaptureEngine.cpp \
+    CaptureManager.cpp \
     Coder.cpp \
     Transmitter.cpp \
-    main.cpp \
-    CameraCapture.cpp
+    main.cpp
 
 HEADERS += \
-    CameraCapture.h \
     CaptureEngine.h \
+    CaptureManager.h \
     Coder.h \
     Transmitter.h
 

@@ -1,4 +1,4 @@
-#include "CameraCapture.h"
+#include "CaptureManager.h"
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
