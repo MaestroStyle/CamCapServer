@@ -14,7 +14,13 @@ bool CaptureEngine::isProcess(){
 void CaptureEngine::startCapture(){
     process = true;
     cv::Mat frame;
-    video_capture.open(id_cur_camera);
+    video_capture.open(id_cur_camera + cv::CAP_ANY);
+    if(!video_capture.isOpened()){
+#ifdef DEBUG_MODE
+            qDebug(QString(QString(__FUNCTION__) + QString(" Error! Unable to open camera!")).toUtf8());
+#endif
+        stopCapture();
+    }
     while(process){
         video_capture.read(frame);
         if(frame.empty()){

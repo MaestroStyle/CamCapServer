@@ -9,6 +9,7 @@ class Coder : public QObject
 
 public:
     Coder();
+
 };
 
 #endif // CODER_H
