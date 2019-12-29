@@ -1,4 +1,4 @@
-#include "CaptureManager.h"
+#include "CameraTransmitter.h"
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/videoio.hpp>
@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    CameraCapture w;
+    CameraTransmitter w;
     w.show();
 //    w.startCapture(0);
 //    cv::VideoCapture *cap = new cv::VideoCapture(0);

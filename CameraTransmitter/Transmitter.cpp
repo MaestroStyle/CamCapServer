@@ -2,27 +2,29 @@
 
 Transmitter::Transmitter()
 {
-    address_label.setText(QString("Adress:"));
-    port_label.setText(QString("Port:"));
-    start_button.setText(QString("Start"));
-    stop_button.setText(QString("Stop"));
-
-    layout.addWidget(&address_label, 0, 0);
-    layout.addWidget(&port_label, 0, 1);
-    layout.addWidget(&address_lineedit, 1,0);
-    layout.addWidget(&port_lineedit, 1,1);
-    layout.addWidget(&start_button, 2, 0);
-    layout.addWidget(&stop_button, 2,1);
 
 }
 
-void Transmitter::startTransmit(){
-    address.setAddress(address_lineedit.text());
+void Transmitter::start(QHostAddress& address, quint16 port){
     if(address.isNull()){
 #ifdef DEBUG_MODE
-        qDebug(QString("Address \"%!\" isn't valid!").arg(address_lineedit.text()).toUtf8());
+        qDebug(QString("Address \"%!\" isn't valid!").arg(address.toString()).toUtf8());
 #endif
         return;
     }
-
+    if(port){
+#ifdef DEBUG_MODE
+        qDebug(QString("Port \"%!\" isn't valid!").arg(port).toUtf8());
+#endif
+        return;
+    }
+    this->address = address;
+    this->port = port;
+    socket.writeDatagram(QString("%1:%2 ready?").arg(address.toString()).arg(port).toUtf8(), address, port);
+    socket.connectToHost(address, port);
+//    socket.bind(address, port);
+}
+void Transmitter::transmitFrame(cv::Mat& frame){
+//    if(socket.is)
+//    socket.writeDatagram()
 }

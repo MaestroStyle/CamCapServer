@@ -1,4 +1,4 @@
-QT       += core gui multimedia network
+QT       += core gui multimedia network concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,16 +16,20 @@ LIBS += opencv_world412d.lib
 
 
 SOURCES += \
+    CameraTransmitter.cpp \
     CaptureEngine.cpp \
     CaptureManager.cpp \
     Coder.cpp \
+    TransmitManager.cpp \
     Transmitter.cpp \
     main.cpp
 
 HEADERS += \
+    CameraTransmitter.h \
     CaptureEngine.h \
     CaptureManager.h \
     Coder.h \
+    TransmitManager.h \
     Transmitter.h
 
 # Default rules for deployment.

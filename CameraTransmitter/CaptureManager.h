@@ -27,8 +27,8 @@ public:
     ~CaptureManager();
 
 private:
-    CaptureEngine capture_engine;
-    QThread thread_for_capture;
+//    CaptureEngine capture_engine;
+//    QThread thread_for_capture;
 
     QGridLayout *layout = nullptr;
     QComboBox *combobox_list_cameras = nullptr;
@@ -41,13 +41,13 @@ private:
     quint32 height_preview = 0;
 
 signals:
-    void captureStarted(qint32 camera_id);
-    void captureStopped();
+    void started(qint32 camera_id);
+    void stopped();
     void captureChanged(qint32 camera_id);
     void frameCaptured(cv::Mat& frame);
 public slots:
-    void startCapture();
-    void stopCapture();
+    void start();
+    void stop();
     void displayFrame(cv::Mat& frame);
     void clearPreview();
 };
