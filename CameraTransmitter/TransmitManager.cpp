@@ -35,20 +35,23 @@ void TransmitManager::start(){
 #endif
         return;
     }
+    start_button.setDisabled(true);
+    stop_button.setDisabled(false);
 
     process = true;
     emit started(address, port);
-
-    start_button.setDisabled(true);
-    stop_button.setDisabled(false);
 }
 void TransmitManager::stop(){
-    process = false;
-    emit stopped();
-
     stop_button.setDisabled(true);
     start_button.setDisabled(false);
+    process = false;
+    emit stopped();
 }
 bool TransmitManager::isProcess(){
     return process;
 }
+void TransmitManager::error(){
+    process = false;
+    stop_button.setDisabled(true);
+    start_button.setDisabled(false);
+ }

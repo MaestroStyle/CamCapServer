@@ -11,8 +11,12 @@ CameraTransmitter::CameraTransmitter(QWidget *parent) : QWidget(parent)
     QObject::connect(&capture_manager, &CaptureManager::captureChanged, &capture_engine, &CaptureEngine::changeCapture);
     QObject::connect(&capture_engine, &CaptureEngine::frameCaptured, &capture_manager, &CaptureManager::displayFrame, Qt::DirectConnection);
     QObject::connect(&capture_engine, &CaptureEngine::stopped, &capture_manager, &CaptureManager::clearPreview, Qt::DirectConnection);
-    QObject::connect(this, &CameraTransmitter::destroyed, &capture_manager, &CaptureManager::stop);
-    QObject::connect(&transmit_manager, &TransmitManager::stopped, &capture_manager, &CaptureManager::stop);
+    QObject::connect(&transmit_manager, &TransmitManager::started, &transmitter, &Transmitter::start);
+    QObject::connect(&transmit_manager, &TransmitManager::stopped, &transmitter, &Transmitter::stop);
+    QObject::connect(&transmitter, &Transmitter::aborted, &transmit_manager, &TransmitManager::error);
+    QObject::connect(&transmitter, &Transmitter::started, this, &CameraTransmitter::startTransmit);
+    QObject::connect(&transmitter, &Transmitter::stopped, this, &CameraTransmitter::stopTransmit);
+
     capture_manager.start();
 }
 void CameraTransmitter::closeEvent(QCloseEvent *event){
@@ -22,4 +26,10 @@ void CameraTransmitter::closeEvent(QCloseEvent *event){
     if(transmit_manager.isProcess()){
         transmit_manager.stop();
     }
+}
+void CameraTransmitter::startTransmit(){
+    QObject::connect(&capture_engine, &CaptureEngine::frameCaptured, &transmitter, &Transmitter::transmitFrame);
+}
+void CameraTransmitter::stopTransmit(){
+    QObject::disconnect(&capture_engine, &CaptureEngine::frameCaptured, &transmitter, &Transmitter::transmitFrame);
 }

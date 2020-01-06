@@ -34,6 +34,7 @@ signals:
 public slots:
     void start();
     void stop();
+    void error();
 };
 
 #endif // TRANSMITMANAGER_H

@@ -21,10 +21,14 @@ private:
     CaptureManager capture_manager;
     CaptureEngine capture_engine;
     TransmitManager transmit_manager;
+    Transmitter transmitter;
 
     void closeEvent(QCloseEvent *event);
-signals:
 
+signals:
+public slots:
+    void startTransmit();
+    void stopTransmit();
 };
 
 #endif // CAMERATRANSMITTER_H
