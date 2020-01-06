@@ -8,6 +8,7 @@ TransmitManager::TransmitManager(QWidget *parent) : QWidget(parent)
     stop_button.setText(QString("Stop"));
     stop_button.setDisabled(true);
 
+    setLayout(&layout);
     layout.addWidget(&address_label, 0, 0);
     layout.addWidget(&port_label, 0, 1);
     layout.addWidget(&address_lineedit, 1,0);
@@ -24,25 +25,30 @@ void TransmitManager::start(){
     quint16 port = port_lineedit.text().toUInt();
     if(address.isNull()){
 #ifdef DEBUG_MODE
-        qDebug(QString("Address \"%!\" isn't valid!").arg(address_lineedit.text()).toUtf8());
+        qDebug(QString("Address \"%1\" isn't valid!").arg(address_lineedit.text()).toUtf8());
 #endif
         return;
     }
-    if(port){
+    if(port == 0){
 #ifdef DEBUG_MODE
-        qDebug(QString("Port \"%!\" isn't valid!").arg(port_lineedit.text()).toUtf8());
+        qDebug(QString("Port \"%1\" isn't valid!").arg(port_lineedit.text()).toUtf8());
 #endif
         return;
     }
 
+    process = true;
     emit started(address, port);
 
     start_button.setDisabled(true);
     stop_button.setDisabled(false);
 }
 void TransmitManager::stop(){
+    process = false;
     emit stopped();
 
     stop_button.setDisabled(true);
     start_button.setDisabled(false);
+}
+bool TransmitManager::isProcess(){
+    return process;
 }

@@ -17,6 +17,7 @@ class TransmitManager : public QWidget
 public:
     explicit TransmitManager(QWidget *parent = nullptr);
 
+    bool isProcess();
 private:
     QGridLayout layout;
     QLabel address_label;
@@ -25,6 +26,8 @@ private:
     QLineEdit port_lineedit;
     QPushButton start_button;
     QPushButton stop_button;
+
+    bool process = false;
 signals:
     void started(QHostAddress& address, quint16 port);
     void stopped();

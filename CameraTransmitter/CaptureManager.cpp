@@ -3,15 +3,13 @@
 CaptureManager::CaptureManager(QWidget *parent)
     : QWidget(parent)
 {
-    layout = new QGridLayout(this);
-    combobox_list_cameras = new QComboBox;
-    layout->addWidget(combobox_list_cameras);
+    setLayout(&layout);
+    layout.addWidget(&combobox_list_cameras);
 
     width_preview = 320;
     height_preview = 240;
-    preview_camera_capture = new QLabel;
-    preview_camera_capture->setMinimumSize(width_preview, height_preview);
-    layout->addWidget(preview_camera_capture);
+    preview_camera_capture.setMinimumSize(width_preview, height_preview);
+    layout.addWidget(&preview_camera_capture);
 
 //    start_capture_button = new QPushButton("Start");
 //    stop_capture_button = new QPushButton("Stop");
@@ -24,11 +22,11 @@ CaptureManager::CaptureManager(QWidget *parent)
     QList<QCameraInfo> list_cameras_info = QCameraInfo::availableCameras();
 
     for (qint32 i = 0; i < list_cameras_info.count(); i++) {
-            combobox_list_cameras->addItem(list_cameras_info[i].description());
+            combobox_list_cameras.addItem(list_cameras_info[i].description());
     }
 
 //    QObject::connect(combobox_list_cameras, &QComboBox::currentIndexChanged, this, &CaptureManager::captureChanged);
-    connect(combobox_list_cameras, SIGNAL(currentIndexChanged(int)), this, SIGNAL(captureChanged(qint32)));
+    connect(&combobox_list_cameras, SIGNAL(currentIndexChanged(int)), this, SIGNAL(captureChanged(qint32)));
 
 //    QObject::connect(&capture_engine, &CaptureEngine::frameCaptured, this, &CaptureManager::displayFrame, Qt::DirectConnection);
 //    QObject::connect(&capture_engine, &CaptureEngine::processStopped, this, &CaptureManager::clearPreview, Qt::DirectConnection);
@@ -55,10 +53,11 @@ CaptureManager::~CaptureManager()
 //    video_capture->release();
 }
 void CaptureManager::start(){
-    qint32 camera_id = combobox_list_cameras->currentIndex();
+    qint32 camera_id = combobox_list_cameras.currentIndex();
 #ifdef DEBUG_MODE
-   qDebug(QString(combobox_list_cameras->currentText() + QString(", id = %1").arg(camera_id)).toUtf8());
+   qDebug(QString(combobox_list_cameras.currentText() + QString(", id = %1").arg(camera_id)).toUtf8());
 #endif
+   process = true;
    emit started(camera_id);
 //   if(capture_engine.isProcess() || thread_for_capture.isRunning())
 //       return;
@@ -72,6 +71,7 @@ void CaptureManager::stop(){
 //    if(capture_engine.isProcess()){
 //        capture_engine.stopCapture();
 //    }
+    process = false;
     emit stopped();
 }
 void CaptureManager::displayFrame(cv::Mat& frame){
@@ -86,12 +86,14 @@ void CaptureManager::displayFrame(cv::Mat& frame){
     cv::cvtColor(copy_frame, copy_frame, cv::COLOR_BGR2RGB);
     QPixmap pix_frame;
     QImage img((uchar*) copy_frame.data, copy_frame.cols, copy_frame.rows, copy_frame.step, QImage::Format_RGB888);
-    preview_camera_capture->setPixmap(QPixmap::fromImage(img, Qt::ColorOnly));
+    preview_camera_capture.setPixmap(QPixmap::fromImage(img, Qt::ColorOnly));
 }
 void CaptureManager::clearPreview(){
-    preview_camera_capture->clear();
+    preview_camera_capture.clear();
 }
-
+bool CaptureManager::isProcess(){
+    return process;
+}
 
 
 

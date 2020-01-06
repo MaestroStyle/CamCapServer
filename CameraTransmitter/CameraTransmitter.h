@@ -20,7 +20,9 @@ private:
 
     CaptureManager capture_manager;
     CaptureEngine capture_engine;
+    TransmitManager transmit_manager;
 
+    void closeEvent(QCloseEvent *event);
 signals:
 
 };

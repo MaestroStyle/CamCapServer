@@ -26,19 +26,21 @@ public:
     CaptureManager(QWidget *parent = nullptr);
     ~CaptureManager();
 
+    bool isProcess();
 private:
 //    CaptureEngine capture_engine;
 //    QThread thread_for_capture;
 
-    QGridLayout *layout = nullptr;
-    QComboBox *combobox_list_cameras = nullptr;
-    QLabel *debug_info = nullptr;
-    QLabel *preview_camera_capture = nullptr;
+    QGridLayout layout;
+    QComboBox combobox_list_cameras;
+    QLabel debug_info;
+    QLabel preview_camera_capture;
 //    QPushButton *start_capture_button = nullptr;
 //    QPushButton *stop_capture_button = nullptr;
 
     quint32 width_preview = 0;
     quint32 height_preview = 0;
+    bool process = false;
 
 signals:
     void started(qint32 camera_id);
