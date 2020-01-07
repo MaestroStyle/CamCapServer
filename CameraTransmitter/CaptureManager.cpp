@@ -94,7 +94,21 @@ void CaptureManager::clearPreview(){
 bool CaptureManager::isProcess(){
     return process;
 }
-
+void CaptureManager::setSizePreview(QSize size){
+    if(size.width() < 0 || size.height() < 0)
+        return;
+    width_preview = static_cast<quint32>(size.width());
+    height_preview = static_cast<quint32>(size.height());
+    preview_camera_capture.setMinimumSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
+}
+void CaptureManager::setSizePreview(quint32 width, quint32 height){
+    width_preview = width;
+    height_preview = height;
+    preview_camera_capture.setMinimumSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
+}
+QSize CaptureManager::getSizePreview(){
+    return QSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
+}
 
 
 

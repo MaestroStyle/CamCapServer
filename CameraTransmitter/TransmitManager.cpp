@@ -22,7 +22,7 @@ TransmitManager::TransmitManager(QWidget *parent) : QWidget(parent)
 
 void TransmitManager::start(){
     QHostAddress address(address_lineedit.text());
-    quint16 port = port_lineedit.text().toUInt();
+    quint16 port = static_cast<quint16>(port_lineedit.text().toUInt());
     if(address.isNull()){
 #ifdef DEBUG_MODE
         qDebug(QString("Address \"%1\" isn't valid!").arg(address_lineedit.text()).toUtf8());

@@ -27,6 +27,9 @@ public:
     ~CaptureManager();
 
     bool isProcess();
+    void setSizePreview(QSize size);
+    void setSizePreview(quint32 width, quint32 height);
+    QSize getSizePreview();
 private:
 //    CaptureEngine capture_engine;
 //    QThread thread_for_capture;
