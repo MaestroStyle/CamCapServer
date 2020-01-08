@@ -20,16 +20,20 @@ public:
     bool isProcess();
 private:
     QGridLayout layout;
-    QLabel address_label;
-    QLabel port_label;
-    QLineEdit address_lineedit;
-    QLineEdit port_lineedit;
+    QLabel server_address_label;
+    QLabel server_port_label;
+    QLineEdit server_address_lineedit;
+    QLineEdit server_port_lineedit;
+    QLabel client_address_label;
+    QLabel client_port_label;
+    QLineEdit client_address_lineedit;
+    QLineEdit client_port_lineedit;
     QPushButton start_button;
     QPushButton stop_button;
 
     bool process = false;
 signals:
-    void started(QHostAddress& address, quint16 port);
+    void started(QHostAddress& server_address, quint16 server_port, QHostAddress& client_address, quint16 client_port);
     void stopped();
 public slots:
     void start();

@@ -27,13 +27,13 @@ private:
     QPushButton start_button;
     QPushButton stop_button;
 
-    QHostAddress command_address;
-    QHostAddress data_address;
-    quint16 command_port = 0;
-    quint16 data_port = 0;
+//    QHostAddress command_address;
+//    QHostAddress data_address;
+//    quint16 command_port = 0;
+//    quint16 data_port = 0;
     bool process = false;
 signals:
-    void started(QHostAddress command_address, quint16 command_port, QHostAddress data_address, quint16 data_port);
+    void started(QHostAddress& command_address, quint16 command_port, QHostAddress& data_address, quint16 data_port);
     void stopped();
 public slots:
     void start();

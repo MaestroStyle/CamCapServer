@@ -28,7 +28,7 @@ void CameraTransmitter::closeEvent(QCloseEvent *event){
     }
 }
 void CameraTransmitter::startTransmit(){
-    QObject::connect(&capture_engine, &CaptureEngine::frameCaptured, &transmitter, &Transmitter::transmitFrame);
+    QObject::connect(&capture_engine, &CaptureEngine::frameCaptured, &transmitter, &Transmitter::transmitFrame, Qt::DirectConnection);
 }
 void CameraTransmitter::stopTransmit(){
     QObject::disconnect(&capture_engine, &CaptureEngine::frameCaptured, &transmitter, &Transmitter::transmitFrame);

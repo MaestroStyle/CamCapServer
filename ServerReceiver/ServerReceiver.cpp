@@ -6,5 +6,11 @@ ServerReceiver::ServerReceiver(QWidget *parent)
     setLayout(&layout);
     layout.addWidget(&receive_preview);
     layout.addWidget(&receiver_manager);
+
+    QObject::connect(&receiver_manager, &ReceiverManager::started, &receiver, &Receiver::start);
+    QObject::connect(&receiver_manager, &ReceiverManager::stopped, &receiver, &Receiver::stop);
+    QObject::connect(&receiver, &Receiver::frameReceived, &receive_preview, &ReceivePreview::displayFrame);
+    QObject::connect(&receiver, &Receiver::receiveStopped, &receive_preview, &ReceivePreview::clearPreview);
+    QObject::connect(&receiver, &Receiver::aborted, &receiver_manager, &ReceiverManager::error);
 }
 

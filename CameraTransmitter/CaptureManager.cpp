@@ -8,7 +8,12 @@ CaptureManager::CaptureManager(QWidget *parent)
 
     width_preview = 320;
     height_preview = 240;
-    preview_camera_capture.setMinimumSize(width_preview, height_preview);
+    preview_camera_capture.setFixedSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
+    preview_camera_capture.setStyleSheet("QLabel {"
+                                  "border-style: solid;"
+                                  "border-width: 1px;"
+                                  "border-color: black; "
+                                  "}");
     layout.addWidget(&preview_camera_capture);
 
 //    start_capture_button = new QPushButton("Start");
@@ -99,12 +104,12 @@ void CaptureManager::setSizePreview(QSize size){
         return;
     width_preview = static_cast<quint32>(size.width());
     height_preview = static_cast<quint32>(size.height());
-    preview_camera_capture.setMinimumSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
+    preview_camera_capture.setFixedSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
 }
 void CaptureManager::setSizePreview(quint32 width, quint32 height){
     width_preview = width;
     height_preview = height;
-    preview_camera_capture.setMinimumSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
+    preview_camera_capture.setFixedSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
 }
 QSize CaptureManager::getSizePreview(){
     return QSize(static_cast<int>(width_preview), static_cast<int>(height_preview));

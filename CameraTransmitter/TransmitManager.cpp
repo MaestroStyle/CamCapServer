@@ -2,36 +2,44 @@
 
 TransmitManager::TransmitManager(QWidget *parent) : QWidget(parent)
 {
-    address_label.setText(QString("Adress:"));
-    port_label.setText(QString("Port:"));
+    server_address_label.setText(QString("Server address:"));
+    server_port_label.setText(QString("Server port:"));
+    client_address_label.setText(QString("Client address:"));
+    client_port_label.setText(QString("Client port:"));
     start_button.setText(QString("Start"));
     stop_button.setText(QString("Stop"));
     stop_button.setDisabled(true);
 
     setLayout(&layout);
-    layout.addWidget(&address_label, 0, 0);
-    layout.addWidget(&port_label, 0, 1);
-    layout.addWidget(&address_lineedit, 1,0);
-    layout.addWidget(&port_lineedit, 1,1);
-    layout.addWidget(&start_button, 2, 0);
-    layout.addWidget(&stop_button, 2,1);
+    layout.addWidget(&server_address_label, 0, 0);
+    layout.addWidget(&server_port_label, 0, 1);
+    layout.addWidget(&server_address_lineedit, 1,0);
+    layout.addWidget(&server_port_lineedit, 1,1);
+    layout.addWidget(&client_address_label, 2, 0);
+    layout.addWidget(&client_port_label, 2, 1);
+    layout.addWidget(&client_address_lineedit, 3,0);
+    layout.addWidget(&client_port_lineedit, 3,1);
+    layout.addWidget(&start_button, 4, 0);
+    layout.addWidget(&stop_button, 4,1);
 
     QObject::connect(&start_button, &QPushButton::clicked, this, &TransmitManager::start);
     QObject::connect(&stop_button, &QPushButton::clicked, this, &TransmitManager::stop);
 }
 
 void TransmitManager::start(){
-    QHostAddress address(address_lineedit.text());
-    quint16 port = static_cast<quint16>(port_lineedit.text().toUInt());
-    if(address.isNull()){
+    QHostAddress server_address(server_address_lineedit.text());
+    QHostAddress client_address(client_address_lineedit.text());
+    quint16 server_port = static_cast<quint16>(server_port_lineedit.text().toUInt());
+    quint16 client_port = static_cast<quint16>(client_port_lineedit.text().toUInt());
+    if(server_address.isNull() || client_address.isNull()){
 #ifdef DEBUG_MODE
-        qDebug(QString("Address \"%1\" isn't valid!").arg(address_lineedit.text()).toUtf8());
+        qDebug(QString("Address \"%1\" isn't valid!").arg(server_address_lineedit.text()).toUtf8());
 #endif
         return;
     }
-    if(port == 0){
+    if(!server_port || !client_port){
 #ifdef DEBUG_MODE
-        qDebug(QString("Port \"%1\" isn't valid!").arg(port_lineedit.text()).toUtf8());
+        qDebug(QString("Port \"%1\" isn't valid!").arg(server_port_lineedit.text()).toUtf8());
 #endif
         return;
     }
@@ -39,7 +47,7 @@ void TransmitManager::start(){
     stop_button.setDisabled(false);
 
     process = true;
-    emit started(address, port);
+    emit started(server_address, server_port, client_address, client_port);
 }
 void TransmitManager::stop(){
     stop_button.setDisabled(true);

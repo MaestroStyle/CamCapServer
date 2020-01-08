@@ -14,9 +14,9 @@ ReceiverManager::ReceiverManager(QWidget *parent) : QWidget(parent)
     layout.addWidget(&start_button, 4, 0);
     layout.addWidget(&stop_button, 4, 1);
 
-    command_address_label.setText(QString("Command slot addres:"));
+    command_address_label.setText(QString("Command slot address:"));
     command_port_label.setText(QString("Command slot port:"));
-    data_address_label.setText(QString("Data slot addres:"));
+    data_address_label.setText(QString("Data slot address:"));
     data_port_label.setText(QString("Data slot port:"));
     start_button.setText(QString("Start"));
     stop_button.setText(QString("Stop"));
@@ -26,12 +26,14 @@ ReceiverManager::ReceiverManager(QWidget *parent) : QWidget(parent)
     QObject::connect(&stop_button, &QPushButton::clicked, this, &ReceiverManager::stop);
 }
 void ReceiverManager::start(){
-    command_address.setAddress(command_address_lineedit.text());
-    data_address.setAddress(data_address_lineedit.text());
-    command_port = static_cast<quint16>(command_port_lineedit.text().toUInt());
-    data_port = static_cast<quint16>(data_port_lineedit.text().toUInt());
+//    command_address.setAddress(command_address_lineedit.text());
+//    data_address.setAddress(data_address_lineedit.text());
+    QHostAddress command_address(command_address_lineedit.text());
+    QHostAddress data_address(data_address_lineedit.text());
+    quint16 command_port = static_cast<quint16>(command_port_lineedit.text().toUInt());
+    quint16 data_port = static_cast<quint16>(data_port_lineedit.text().toUInt());
 
-    if(command_address.isNull() || data_address.isNull() || command_port || data_port)
+    if(command_address.isNull() || data_address.isNull() || !command_port || !data_port)
         return;
 
     start_button.setDisabled(true);

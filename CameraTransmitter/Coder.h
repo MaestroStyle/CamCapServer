@@ -2,6 +2,8 @@
 #define CODER_H
 
 #include <QObject>
+#include <QDebug>
+#include <opencv2/opencv.hpp>
 
 class Coder : public QObject
 {
@@ -9,7 +11,8 @@ class Coder : public QObject
 
 public:
     Coder();
-
+public slots:
+    QByteArray encode(cv::Mat& frame);
 };
 
 #endif // CODER_H

@@ -6,7 +6,7 @@ ReceivePreview::ReceivePreview(QWidget *parent) : QWidget(parent)
     layout.addWidget(&preview_display);
     width_preview = 320;
     height_preview = 240;
-    preview_display.setMinimumSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
+    preview_display.setFixedSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
     preview_display.setStyleSheet("QLabel {"
                                   "border-style: solid;"
                                   "border-width: 1px;"
@@ -47,12 +47,12 @@ void ReceivePreview::setSizePreview(QSize size){
         return;
     width_preview = static_cast<quint32>(size.width());
     height_preview = static_cast<quint32>(size.height());
-    preview_display.setMinimumSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
+    preview_display.setFixedSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
 }
 void ReceivePreview::setSizePreview(quint32 width, quint32 height){
     width_preview = width;
     height_preview = height;
-    preview_display.setMinimumSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
+    preview_display.setFixedSize(static_cast<int>(width_preview), static_cast<int>(height_preview));
 }
 QSize ReceivePreview::getSizePreview(){
     return QSize(static_cast<int>(width_preview), static_cast<int>(height_preview));

@@ -20,5 +20,6 @@ private:
 
     ReceivePreview receive_preview;
     ReceiverManager receiver_manager;
+    Receiver receiver;
 };
 #endif // SERVER_H
