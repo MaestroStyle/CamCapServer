@@ -7,6 +7,7 @@
 #include "ReceivePreview.h"
 #include "ReceiverManager.h"
 #include "Receiver.h"
+#include "Decoder.h"
 
 class ServerReceiver : public QWidget
 {
@@ -21,5 +22,6 @@ private:
     ReceivePreview receive_preview;
     ReceiverManager receiver_manager;
     Receiver receiver;
+    Decoder decoder;
 };
 #endif // SERVER_H

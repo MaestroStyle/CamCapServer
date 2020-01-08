@@ -37,83 +37,90 @@ void Receiver::receiveCommand(){
     QStringList args_command = command.split(" ");
     if(args_command.isEmpty())
         return;
-
+    if(args_command[0] == "GOT"){
+        quint64 id_got_datagram = args_command[1].toULongLong();
+        quint32 size_datagram = args_command[2].toUInt();
+        if(id_got_datagram != id_cur_datagram || size_datagram != static_cast<quint32>(buf_datagram.size())){
+            socket_sender.writeDatagram("REPEAT", client_address, client_port);
+        } else{
+            socket_sender.writeDatagram("OK", client_address, client_port);
+        }
+        return;
+    }
     if(args_command[0] == "PORT"){
-        QHostAddress address(args_command[1]);
-        quint16 port = static_cast<quint16>(args_command[2].toUInt());
-        if(address.isNull() || !port)
+        client_address = QHostAddress(args_command[1]);
+        client_port = static_cast<quint16>(args_command[2].toUInt());
+        if(client_address.isNull() || !client_port)
             return;
         if(isProcessReceive()){
-            command_socket.writeDatagram(QString("CANCELED").toUtf8(), address, port);
+            socket_sender.writeDatagram(QString("CANCELED").toUtf8(), client_address, client_port);
             return;
         }
         data_socket.bind(data_address, data_port);
-        process_receive = true;
-        emit receiveStarted();
-        command_socket.writeDatagram(QString("PORT %1 %2").arg(data_address.toString()).arg(data_port).toUtf8(), address, port);
+        qint32 count_try_connect = 100;
+        while (count_try_connect--) {
+            socket_sender.writeDatagram(QString("PORT %1 %2").arg(data_address.toString()).arg(data_port).toUtf8(), client_address, client_port);
+            if(command_socket.hasPendingDatagrams()){
+                QNetworkDatagram answer_datagram = command_socket.receiveDatagram();
+                QString answer_client = QString(answer_datagram.data());
+                if(answer_client == "OK"){
+                    socket_sender.writeDatagram(QString("OK").toUtf8(), client_address, client_port);
+                    process_receive = true;
+                    buf_datagram.clear();
+                    id_cur_datagram = 0;
+                    emit receiveStarted();
+                    break;
+                }
+            }
+        }
         return;
     }
     if(args_command[0] == "DISCONNECT"){
         process_receive = false;
         data_socket.close();
         buf_data_frame.clear();
+        buf_datagram.clear();
+        id_cur_datagram = 0;
         count_byte = 0;
+        socket_sender.writeDatagram("OK", client_address, client_port);
         emit receiveStopped();
         return;
     }
 }
 void Receiver::receiveFrame(){
-    QString data;
     if(data_socket.hasPendingDatagrams()){
         QNetworkDatagram datagram = data_socket.receiveDatagram();
-        data = QString(datagram.data());
+        buf_datagram = datagram.data();
     }
-    if(data.isEmpty())
+    if(buf_datagram.isEmpty())
         return;
-    if(data.left(11) == "FRAME_BEGIN"){
-        qDebug() << "FRAME_BEGIN";
+
+    qint32 pos_space = buf_datagram.indexOf(' ');
+    if(pos_space == -1)
+        return;
+    id_cur_datagram = buf_datagram.left(pos_space).toULongLong();
+    buf_datagram.remove(0, pos_space);
+
+    if(buf_datagram == "FRAME_BEGIN"){
         buf_data_frame.clear();
-        QStringList args_frame = data.split(" ");
-        if(args_frame.isEmpty())
-            return;
-        count_byte = args_frame[1].toUInt();
-        byte_for_num = args_frame[2].toUInt();
-        max_size_datagram = args_frame[3].toUInt();
-        prev_num_datagram = 0;
-        if(!count_byte)
-            return;
         return;
     }
-    if(data.left(9) == "FRAME_END"){
-        qDebug() << "FRAME_END";
-//        qint32 num_byte_missing = static_cast<qint32>(count_byte) - buf_data_frame.count();
-//        if(num_byte_missing > 0){
-//            buf_data_frame.append(num_byte_missing, '0');
-//        }
-        Decoder decoder;
-        cv::Mat frame = decoder.decode(buf_data_frame);
-        emit frameReceived(frame);
+
+    if(buf_datagram == "FRAME_END"){
+        emit frameReceived(buf_data_frame);
         return;
     }
-    qDebug() << data.left(byte_for_num);
-    qDebug() << data.size();
-    quint32 cur_num_datagram = data.left(byte_for_num).toUInt();
-    data.remove(0, byte_for_num);
-    qDebug() << cur_num_datagram;
-    if(prev_num_datagram + 1 < cur_num_datagram){
-        quint32 count_missing_datagram = cur_num_datagram - prev_num_datagram;
-        buf_data_frame.append(max_size_datagram * count_missing_datagram, '0');
-    }
-    buf_data_frame.append(data);
-    buf_data_frame.append(max_size_datagram - data.size(), '0');
-    prev_num_datagram = cur_num_datagram;
+
+    buf_data_frame.append(buf_datagram);
 }
 void Receiver::stop(){
     if(isProcessReceive()){
         process_receive = false;
         data_socket.close();
         buf_data_frame.clear();
+        buf_datagram.clear();
         count_byte = 0;
+        id_cur_datagram = 0;
         emit receiveStopped();
     }
     server_running = false;

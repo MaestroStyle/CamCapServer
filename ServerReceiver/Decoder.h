@@ -9,8 +9,10 @@ class Decoder : public QObject
     Q_OBJECT
 public:
     Decoder();
+signals:
+    void decoded(cv::Mat& frame_decoded);
 public slots:
-    cv::Mat decode(QByteArray& data);
+    void decode(QByteArray& data);
 };
 
 #endif // DECODER_H

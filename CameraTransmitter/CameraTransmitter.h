@@ -8,6 +8,7 @@
 #include "CaptureEngine.h"
 #include "TransmitManager.h"
 #include "Transmitter.h"
+#include "Coder.h"
 
 class CameraTransmitter : public QWidget
 {
@@ -22,6 +23,7 @@ private:
     CaptureEngine capture_engine;
     TransmitManager transmit_manager;
     Transmitter transmitter;
+    Coder coder;
 
     void closeEvent(QCloseEvent *event);
 

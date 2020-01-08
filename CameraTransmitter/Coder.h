@@ -11,8 +11,10 @@ class Coder : public QObject
 
 public:
     Coder();
+signals:
+    void encoded(QByteArray& data);
 public slots:
-    QByteArray encode(cv::Mat& frame);
+    void encode(cv::Mat& frame);
 };
 
 #endif // CODER_H

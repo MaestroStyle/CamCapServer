@@ -21,10 +21,13 @@ public:
 private:
     QUdpSocket command_socket;
     QUdpSocket data_socket;
+    QUdpSocket socket_sender;
     QHostAddress command_address;
     QHostAddress data_address;
+    QHostAddress client_address;
     quint16 command_port = 0;
     quint16 data_port = 0;
+    quint16 client_port = 0;
     bool process_receive = false;
     bool server_running = false;
 
@@ -33,6 +36,8 @@ private:
     quint32 prev_num_datagram = 0;
     quint32 max_size_datagram = 0;
     QByteArray buf_data_frame;
+    QByteArray buf_datagram;
+    quint64 id_cur_datagram = 0;
 signals:
     void started();
     void stopped();
@@ -40,7 +45,7 @@ signals:
     void receiveStarted();
     void receiveStopped();
     void receiveAborted();
-    void frameReceived(cv::Mat& frame);
+    void frameReceived(QByteArray& data);
 public slots:
     void start(QHostAddress& command_address, quint16 command_port, QHostAddress& data_address, quint16 data_port);
     void receiveCommand();

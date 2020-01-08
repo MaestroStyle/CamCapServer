@@ -35,6 +35,7 @@ private:
     quint16 client_port = 0;
     quint32 max_size_datagram = 0;
     bool process = false;
+    quint64 id_cur_datagram = 0;
 signals:
     void started();
     void stopped();
@@ -42,7 +43,8 @@ signals:
 public slots:
     void start(QHostAddress& server_address, quint16 server_port, QHostAddress client_address, quint16 client_port);
     void stop();
-    void transmitFrame(cv::Mat& frame);
+    void transmitFrame(QByteArray& frame_encoded);
+    bool transmitDatagram(QByteArray& datagram, quint32 count_try = 100);
 };
 
 #endif // TRANSMITTER_H

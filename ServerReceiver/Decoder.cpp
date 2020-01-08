@@ -4,10 +4,10 @@ Decoder::Decoder()
 {
 
 }
-cv::Mat Decoder::decode(QByteArray& data){
+void Decoder::decode(QByteArray& data){
     if(data.isEmpty())
-        return cv::Mat();
+        return;
     std::vector<char> buf(data.begin(), data.end());
     cv::Mat frame = cv::imdecode(buf, cv::IMREAD_COLOR);
-    return frame;
+    emit decoded(frame);
 }
