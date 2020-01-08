@@ -57,9 +57,7 @@ void Receiver::receiveCommand(){
         process_receive = false;
         data_socket.close();
         buf_data_frame.clear();
-        frame_type = 0;
-        frame_width = 0;
-        frame_height = 0;
+        count_byte = 0;
         emit receiveStopped();
         return;
     }
@@ -73,39 +71,49 @@ void Receiver::receiveFrame(){
     if(data.isEmpty())
         return;
     if(data.left(11) == "FRAME_BEGIN"){
+        qDebug() << "FRAME_BEGIN";
         buf_data_frame.clear();
         QStringList args_frame = data.split(" ");
         if(args_frame.isEmpty())
             return;
-        frame_width = args_frame[1].toUInt();
-        frame_height = args_frame[2].toUInt();
-        frame_type = args_frame[3].toInt();
-        frame_pix_size = static_cast<quint32>(args_frame[4].toInt());
-        if(!frame_width || !frame_height || !frame_pix_size)
+        count_byte = args_frame[1].toUInt();
+        byte_for_num = args_frame[2].toUInt();
+        max_size_datagram = args_frame[3].toUInt();
+        prev_num_datagram = 0;
+        if(!count_byte)
             return;
         return;
     }
     if(data.left(9) == "FRAME_END"){
-//        qint32 num_byte_missing = frame_width * frame_height * frame_pix_size - buf_data_frame.count();
+        qDebug() << "FRAME_END";
+//        qint32 num_byte_missing = static_cast<qint32>(count_byte) - buf_data_frame.count();
 //        if(num_byte_missing > 0){
 //            buf_data_frame.append(num_byte_missing, '0');
 //        }
-//        cv::Mat frame(static_cast<int>(frame_height), static_cast<int>(frame_width), frame_type, buf_data_frame.data());
         Decoder decoder;
         cv::Mat frame = decoder.decode(buf_data_frame);
         emit frameReceived(frame);
         return;
     }
+    qDebug() << data.left(byte_for_num);
+    qDebug() << data.size();
+    quint32 cur_num_datagram = data.left(byte_for_num).toUInt();
+    data.remove(0, byte_for_num);
+    qDebug() << cur_num_datagram;
+    if(prev_num_datagram + 1 < cur_num_datagram){
+        quint32 count_missing_datagram = cur_num_datagram - prev_num_datagram;
+        buf_data_frame.append(max_size_datagram * count_missing_datagram, '0');
+    }
     buf_data_frame.append(data);
+    buf_data_frame.append(max_size_datagram - data.size(), '0');
+    prev_num_datagram = cur_num_datagram;
 }
 void Receiver::stop(){
     if(isProcessReceive()){
         process_receive = false;
         data_socket.close();
         buf_data_frame.clear();
-        frame_type = 0;
-        frame_width = 0;
-        frame_height = 0;
+        count_byte = 0;
         emit receiveStopped();
     }
     server_running = false;

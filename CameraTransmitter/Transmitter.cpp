@@ -46,25 +46,28 @@ void Transmitter::start(QHostAddress& server_address, quint16 server_port, QHost
     emit started();
 }
 void Transmitter::transmitFrame(cv::Mat& frame){
-    socket_sender.writeDatagram(QString("FRAME_BEGIN %1 %2 %3 %4").arg(frame.cols).arg(frame.rows).arg(frame.type()).arg(frame.elemSize()).toUtf8(),
-                                server_data_address,
-                                server_data_port);
-    qint32 count_bytes = static_cast<qint32>(frame.total() * frame.elemSize());
     Coder coder;
     QByteArray encoded_frame = coder.encode(frame);
-    qDebug() << "Frame don't encoded size: " << count_bytes;
-    qDebug() << "Frame encoded size: " << encoded_frame.size();
+    quint32 byte_for_num = 5;
     qint32 cur_offset = 0;
+    QByteArray datagram;
+    quint32 i = 0;
+    socket_sender.writeDatagram(QString("FRAME_BEGIN %1 %2 %3").arg(encoded_frame.size()).arg(byte_for_num).arg(max_size_datagram).toUtf8(),
+                                server_data_address,
+                                server_data_port);
     while (cur_offset + static_cast<qint32>(max_size_datagram) < encoded_frame.size()) {
-            socket_sender.writeDatagram(encoded_frame.data() + cur_offset, max_size_datagram, server_data_address, server_data_port);
-            cur_offset += max_size_datagram;
-        }
-    socket_sender.writeDatagram(encoded_frame.data() + cur_offset, count_bytes - cur_offset, server_data_address, server_data_port);
-//    while (cur_offset + static_cast<qint32>(max_size_datagram) < count_bytes) {
-//        socket_sender.writeDatagram((const char*)frame.data + cur_offset, max_size_datagram, server_data_address, server_data_port);
-//        cur_offset += max_size_datagram;
-//    }
-//    socket_sender.writeDatagram((const char*)frame.data + cur_offset, count_bytes - cur_offset, server_data_address, server_data_port);
+        datagram.append(QString::number(i).leftJustified(byte_for_num));
+        datagram.append(encoded_frame.data() + cur_offset, max_size_datagram - byte_for_num);
+        socket_sender.writeDatagram(datagram, max_size_datagram, server_data_address, server_data_port);
+        cur_offset += max_size_datagram - byte_for_num;
+        i++;
+        qDebug() << datagram.left(byte_for_num);
+        qDebug() << datagram.size();
+        datagram.clear();
+    }
+    datagram.append(QString::number(i).leftJustified(byte_for_num));
+    datagram.append(encoded_frame.data() + cur_offset, encoded_frame.size() - cur_offset);
+    socket_sender.writeDatagram(datagram, encoded_frame.size() - cur_offset, server_data_address, server_data_port);
     socket_sender.writeDatagram("FRAME_END", server_data_address, server_data_port);
 }
 void Transmitter::stop(){

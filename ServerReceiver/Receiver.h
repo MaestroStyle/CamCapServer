@@ -28,10 +28,10 @@ private:
     bool process_receive = false;
     bool server_running = false;
 
-    quint32 frame_width = 0;
-    quint32 frame_height = 0;
-    qint32 frame_type = 0;
-    quint32 frame_pix_size = 0;
+    quint32 count_byte = 0;
+    quint32 byte_for_num = 0;
+    quint32 prev_num_datagram = 0;
+    quint32 max_size_datagram = 0;
     QByteArray buf_data_frame;
 signals:
     void started();
