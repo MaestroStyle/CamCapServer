@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <opencv2/opencv.hpp>
 
+//#define FIX_SIZE_FRAME_TRANSMIT
+
 class Coder : public QObject
 {
     Q_OBJECT

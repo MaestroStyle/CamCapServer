@@ -16,7 +16,7 @@
 
 //#include "CaptureEngine.h"
 
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 class CaptureManager : public QWidget
 {

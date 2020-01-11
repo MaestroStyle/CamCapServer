@@ -157,7 +157,7 @@ void Transmitter::stop(){
     emit stopped();
 }
 void Transmitter::abort(){
-    if(socket_listener.state() != QAbstractSocket::SocketState::BoundState)
+    if(socket_listener.state() == QAbstractSocket::SocketState::BoundState)
         socket_listener.close();
 #ifdef DEBUG_MODE
     qDebug() << QString("listener: %1:%2 - close").arg(client_address.toString()).arg(client_port).toUtf8();

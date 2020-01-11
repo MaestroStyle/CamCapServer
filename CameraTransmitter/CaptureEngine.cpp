@@ -47,7 +47,7 @@ void CaptureEngine::stop(){
 }
 void CaptureEngine::changeCapture(qint32 camera_id){
     stop();
-    thread()->msleep(100);
+    thread()->msleep(200);
     start(camera_id);
 }
 //void CaptureEngine::setIdCamera(qint32 camera_id){
