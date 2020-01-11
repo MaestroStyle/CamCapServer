@@ -2,7 +2,8 @@
 
 Receiver::Receiver()
 {
-    count_try_transmit = 3;
+    count_try_transmit = 5;
+    count_msec_for_ready_read = 1000;
 
     QObject::connect(&command_socket, &QUdpSocket::readyRead, this, &Receiver::receiveCommand, Qt::DirectConnection);
     QObject::connect(&data_socket, &QUdpSocket::readyRead, this, &Receiver::receiveFrame, Qt::DirectConnection);
@@ -72,10 +73,13 @@ void Receiver::receiveCommand(){
             socket_sender.writeDatagram(QString("PORT %1 %2").arg(data_address.toString()).arg(data_port).toUtf8(), client_address, client_port);
             if(command_socket.state() != QAbstractSocket::SocketState::BoundState){
                 process_receive = false;
+#ifdef DEBUG_MODE
+    qDebug() << QString("data: %1:%2 - close").arg(data_address.toString()).arg(data_port).toUtf8();
+#endif
                 data_socket.close();
                 return;
             }
-            if(command_socket.hasPendingDatagrams()){
+            if(command_socket.waitForReadyRead(count_msec_for_ready_read)){
                 QNetworkDatagram answer_datagram = command_socket.receiveDatagram();
                 QString answer_client = QString(answer_datagram.data());
 #ifdef DEBUG_MODE
@@ -111,7 +115,7 @@ void Receiver::receiveCommand(){
         buf_datagram.clear();
         id_cur_datagram = 0;
         count_byte = 0;
-        socket_sender.writeDatagram("OK", client_address, client_port);
+        socket_sender.writeDatagram("DICSKONNECTED", client_address, client_port);
         emit receiveStopped();
         return;
     }

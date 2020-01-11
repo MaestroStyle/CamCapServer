@@ -16,7 +16,8 @@ CameraTransmitter::CameraTransmitter(QWidget *parent) : QWidget(parent)
     QObject::connect(&transmitter, &Transmitter::aborted, &transmit_manager, &TransmitManager::error, Qt::DirectConnection);
     QObject::connect(&transmitter, &Transmitter::started, this, &CameraTransmitter::startTransmit, Qt::DirectConnection);
     QObject::connect(&transmitter, &Transmitter::stopped, this, &CameraTransmitter::stopTransmit, Qt::DirectConnection);
-    QObject::connect(&coder, &Coder::encoded, &transmitter, &Transmitter::transmitFrame);
+    QObject::connect(&coder, &Coder::encoded, this, &CameraTransmitter::preparationForTransmit);
+    QObject::connect(this, &CameraTransmitter::frameReady, &transmitter, &Transmitter::transmitFrame);
     transmitter.moveToThread(&thread_transmit);
     thread_transmit.start();
     capture_manager.start();
@@ -36,4 +37,9 @@ void CameraTransmitter::startTransmit(){
 }
 void CameraTransmitter::stopTransmit(){
     QObject::disconnect(&capture_engine, &CaptureEngine::frameCaptured, &coder, &Coder::encode);
+}
+void CameraTransmitter::preparationForTransmit(QByteArray frame_encoded){
+    if(!transmitter.isReadyTransmit())
+        return;
+    emit frameReady(frame_encoded);
 }

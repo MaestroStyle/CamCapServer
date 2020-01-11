@@ -10,7 +10,7 @@
 #include <opencv2/core.hpp>
 #include <Coder.h>
 
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 class Transmitter : public QObject
 {
@@ -24,6 +24,7 @@ public:
     QHostAddress getClientAdress();
     quint16 getClientPort();
     quint32 getMaxSizeDatagram();
+    bool isReadyTransmit();
 private:
     QUdpSocket socket_sender;
     QUdpSocket socket_listener;
@@ -35,8 +36,10 @@ private:
     quint16 client_port = 0;
     quint32 max_size_datagram = 0;
     bool process = false;
+    bool is_ready_transmit = false;
     quint64 id_cur_datagram = 0;
     quint32 count_try_transmit = 0;
+    qint32 count_msec_for_ready_read = 0;
 signals:
     void started();
     void stopped();
@@ -44,8 +47,8 @@ signals:
 public slots:
     void start(QHostAddress& server_address, quint16 server_port, QHostAddress client_address, quint16 client_port);
     void stop();
-    void transmitFrame(QByteArray frame_encoded);
-    bool transmitDatagram(QByteArray datagram, quint32 count_try = 3);
+    void transmitFrame(QByteArray frame);
+    bool transmitDatagram(QByteArray& datagram, quint32 count_try = 3);
     void abort();
 };
 

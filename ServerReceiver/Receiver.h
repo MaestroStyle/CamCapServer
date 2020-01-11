@@ -8,7 +8,7 @@
 
 #include <opencv2/opencv.hpp>
 
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 class Receiver : public QObject
 {
@@ -39,6 +39,7 @@ private:
     QByteArray buf_datagram;
     quint64 id_cur_datagram = 0;
     quint32 count_try_transmit = 0;
+    qint32 count_msec_for_ready_read = 0;
 signals:
     void started();
     void stopped();

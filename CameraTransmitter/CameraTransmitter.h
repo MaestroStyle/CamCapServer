@@ -31,9 +31,11 @@ private:
     void closeEvent(QCloseEvent *event);
 
 signals:
+    void frameReady(QByteArray encoded_frame);
 public slots:
     void startTransmit();
     void stopTransmit();
+    void preparationForTransmit(QByteArray frame_encoded);
 };
 
 #endif // CAMERATRANSMITTER_H

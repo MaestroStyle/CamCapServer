@@ -3,7 +3,8 @@
 Transmitter::Transmitter()
 {
     max_size_datagram = 500;
-    count_try_transmit = 3;
+    count_try_transmit = 5;
+    count_msec_for_ready_read = 1000;
 }
 
 void Transmitter::start(QHostAddress& server_address, quint16 server_port, QHostAddress client_address, quint16 client_port){
@@ -21,13 +22,13 @@ void Transmitter::start(QHostAddress& server_address, quint16 server_port, QHost
     qDebug() << QString("listener: %1:%2 - opened").arg(client_address.toString()).arg(client_port).toUtf8();
 #endif
     socket_listener.bind(this->client_address, this->client_port);
-    quint32 count_try_connect = count_try_transmit * 3;
+    quint32 count_try_connect = count_try_transmit;
     QString answer_server;
     while(count_try_connect--){
         socket_sender.writeDatagram(QString("PORT %1 %2").arg(this->client_address.toString()).arg(this->client_port).toUtf8(),
                                     server_command_address,
                                     server_command_port);
-        if(socket_listener.hasPendingDatagrams()){
+        if(socket_listener.waitForReadyRead(count_msec_for_ready_read)){
             QNetworkDatagram datagram = socket_listener.receiveDatagram();
             answer_server = QString(datagram.data());
             if(answer_server.isEmpty()){
@@ -48,13 +49,13 @@ void Transmitter::start(QHostAddress& server_address, quint16 server_port, QHost
                 abort();
                 return;
             }
-            count_try_connect = count_try_transmit * 3;
+            count_try_connect = count_try_transmit;
 
             while(count_try_connect--){
                 socket_sender.writeDatagram(QString("OK").toUtf8(),
                                             server_command_address,
                                             server_command_port);
-                if(socket_listener.hasPendingDatagrams()){
+                if(socket_listener.waitForReadyRead(count_msec_for_ready_read)){
                     QNetworkDatagram answer_datagram = socket_listener.receiveDatagram();
 #ifdef DEBUG_MODE
         qDebug() << answer_datagram.data();
@@ -64,6 +65,7 @@ void Transmitter::start(QHostAddress& server_address, quint16 server_port, QHost
                 }
             }
             process = true;
+            is_ready_transmit = true;
             id_cur_datagram = 0;
             emit started();
             return;
@@ -71,26 +73,28 @@ void Transmitter::start(QHostAddress& server_address, quint16 server_port, QHost
     }
     abort();
 }
-void Transmitter::transmitFrame(QByteArray frame_encoded){
+void Transmitter::transmitFrame(QByteArray frame){
     if(!process)
         return;
+    is_ready_transmit = false;
     QByteArray header_frame = "FRAME_BEGIN";
     transmitDatagram(header_frame, count_try_transmit);
 
     qint32 cur_offset = 0;
     QByteArray datagram;
-    while (process && cur_offset + static_cast<qint32>(max_size_datagram) < frame_encoded.size()) {
-        datagram = QByteArray(frame_encoded.data() + cur_offset, max_size_datagram);
+    while (process && cur_offset + static_cast<qint32>(max_size_datagram) < frame.size()) {
+        datagram = QByteArray(frame.data() + cur_offset, max_size_datagram);
         transmitDatagram(datagram, count_try_transmit);
         cur_offset += max_size_datagram;
     }
-    datagram = QByteArray(frame_encoded.data() + cur_offset, frame_encoded.size() - cur_offset);
+    datagram = QByteArray(frame.data() + cur_offset, frame.size() - cur_offset);
     transmitDatagram(datagram, count_try_transmit);
 
     QByteArray footer_frame = "FRAME_END";
     transmitDatagram(footer_frame, count_try_transmit);
+    is_ready_transmit = true;
 }
-bool Transmitter::transmitDatagram(QByteArray datagram, quint32 count_try){
+bool Transmitter::transmitDatagram(QByteArray& datagram, quint32 count_try){
     if(!process)
         return false;
     QByteArray package;
@@ -101,7 +105,7 @@ bool Transmitter::transmitDatagram(QByteArray datagram, quint32 count_try){
         socket_sender.writeDatagram(QString("GOT %1 %2").arg(id_cur_datagram).arg(datagram.size()).toUtf8(), server_command_address, server_command_port);
         if(socket_listener.state() != QAbstractSocket::SocketState::BoundState)
             return false;
-        if(socket_listener.hasPendingDatagrams()){
+        if(socket_listener.waitForReadyRead(count_msec_for_ready_read)){
             QNetworkDatagram answer_datagram = socket_listener.receiveDatagram();
             QString answer_server = QString(answer_datagram.data());
 #ifdef DEBUG_MODE
@@ -119,7 +123,6 @@ bool Transmitter::transmitDatagram(QByteArray datagram, quint32 count_try){
 void Transmitter::stop(){
     if(!process)
         return;
-    process = false;
     qint32 count_try_connect = count_try_transmit;
     QString answer_server;
     while(count_try_connect--){
@@ -128,21 +131,24 @@ void Transmitter::stop(){
                                     server_command_port);
         if(socket_listener.state() != QAbstractSocket::SocketState::BoundState){
             id_cur_datagram = 0;
+            is_ready_transmit = false;
+            process = false;
             emit stopped();
             return;
         }
-        if(socket_listener.hasPendingDatagrams()){
+        if(socket_listener.waitForReadyRead(count_msec_for_ready_read)){
             QNetworkDatagram datagram = socket_listener.receiveDatagram();
             answer_server = QString(datagram.data());
 #ifdef DEBUG_MODE
             qDebug() << answer_server;
 #endif
-            if(answer_server == "OK"){
+            if(answer_server == "DICSKONNECTED"){
                 break;
             }
         }
     }
     process = false;
+    is_ready_transmit = false;
     id_cur_datagram = 0;
     socket_listener.close();
 #ifdef DEBUG_MODE
@@ -156,6 +162,7 @@ void Transmitter::abort(){
 #ifdef DEBUG_MODE
     qDebug() << QString("listener: %1:%2 - close").arg(client_address.toString()).arg(client_port).toUtf8();
 #endif
+    is_ready_transmit = false;
     process = false;
     emit aborted();
 }
@@ -176,4 +183,7 @@ QHostAddress Transmitter::getClientAdress(){
 }
 quint32 Transmitter::getMaxSizeDatagram(){
     return max_size_datagram;
+}
+bool Transmitter::isReadyTransmit(){
+    return is_ready_transmit;
 }
