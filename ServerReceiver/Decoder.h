@@ -12,7 +12,7 @@ public:
 signals:
     void decoded(cv::Mat& frame_decoded);
 public slots:
-    void decode(QByteArray& data);
+    void decode(QByteArray data);
 };
 
 #endif // DECODER_H

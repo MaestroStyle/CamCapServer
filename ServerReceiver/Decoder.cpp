@@ -4,7 +4,7 @@ Decoder::Decoder()
 {
 
 }
-void Decoder::decode(QByteArray& data){
+void Decoder::decode(QByteArray data){
     if(data.isEmpty())
         return;
     std::vector<char> buf(data.begin(), data.end());

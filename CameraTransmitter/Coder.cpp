@@ -9,7 +9,9 @@ void Coder::encode(cv::Mat& frame){
     cv::imencode("frame.jpeg", frame, buf, params);
     if(buf.empty())
         return;
+#ifdef DEBUG_MODE
     qDebug() << "Frame encoded size: " << buf.size();
+#endif
     QByteArray data = QByteArray((const char*)buf.data(), static_cast<int>(buf.size()));
     emit encoded(data);
 }

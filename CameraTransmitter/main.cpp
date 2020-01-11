@@ -7,6 +7,8 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QCoreApplication::setOrganizationName("CamCapServer");
+    QCoreApplication::setApplicationName("CameraTransmitter");
     CameraTransmitter w;
     w.show();
 //    w.startCapture(0);

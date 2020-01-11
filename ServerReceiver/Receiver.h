@@ -8,7 +8,7 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "Decoder.h"
+#define DEBUG_MODE
 
 class Receiver : public QObject
 {
@@ -38,6 +38,7 @@ private:
     QByteArray buf_data_frame;
     QByteArray buf_datagram;
     quint64 id_cur_datagram = 0;
+    quint32 count_try_transmit = 0;
 signals:
     void started();
     void stopped();
@@ -45,9 +46,9 @@ signals:
     void receiveStarted();
     void receiveStopped();
     void receiveAborted();
-    void frameReceived(QByteArray& data);
+    void frameReceived(QByteArray data);
 public slots:
-    void start(QHostAddress& command_address, quint16 command_port, QHostAddress& data_address, quint16 data_port);
+    void start(QHostAddress command_address, quint16 command_port, QHostAddress data_address, quint16 data_port);
     void receiveCommand();
     void receiveFrame();
     void stop();

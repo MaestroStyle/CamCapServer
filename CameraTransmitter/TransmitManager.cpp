@@ -10,6 +10,11 @@ TransmitManager::TransmitManager(QWidget *parent) : QWidget(parent)
     stop_button.setText(QString("Stop"));
     stop_button.setDisabled(true);
 
+    server_address_lineedit.setText(hosts.value("server_address", "").toString());
+    server_port_lineedit.setText(hosts.value("server_port","").toString());
+    client_address_lineedit.setText(hosts.value("client_address","").toString());
+    client_port_lineedit.setText(hosts.value("client_port","").toString());
+
     setLayout(&layout);
     layout.addWidget(&server_address_label, 0, 0);
     layout.addWidget(&server_port_label, 0, 1);
@@ -25,7 +30,12 @@ TransmitManager::TransmitManager(QWidget *parent) : QWidget(parent)
     QObject::connect(&start_button, &QPushButton::clicked, this, &TransmitManager::start);
     QObject::connect(&stop_button, &QPushButton::clicked, this, &TransmitManager::stop);
 }
-
+TransmitManager::~TransmitManager(){
+    hosts.setValue("server_address", server_address_lineedit.text());
+    hosts.setValue("server_port", server_port_lineedit.text());
+    hosts.setValue("client_address", client_address_lineedit.text());
+    hosts.setValue("client_port", client_port_lineedit.text());
+}
 void TransmitManager::start(){
     QHostAddress server_address(server_address_lineedit.text());
     QHostAddress client_address(client_address_lineedit.text());

@@ -7,7 +7,7 @@
 #include <opencv2/videoio.hpp>
 
 #include <QtConcurrent/QtConcurrent>
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 class CaptureEngine : public QObject
 {

@@ -8,6 +8,7 @@
 #include <QPushButton>
 
 #include <QHostAddress>
+#include <QSettings>
 
 #define DEBUG_MODE
 
@@ -16,6 +17,7 @@ class TransmitManager : public QWidget
     Q_OBJECT
 public:
     explicit TransmitManager(QWidget *parent = nullptr);
+    ~TransmitManager();
 
     bool isProcess();
 private:
@@ -31,6 +33,7 @@ private:
     QPushButton start_button;
     QPushButton stop_button;
 
+    QSettings hosts;
     bool process = false;
 signals:
     void started(QHostAddress& server_address, quint16 server_port, QHostAddress& client_address, quint16 client_port);

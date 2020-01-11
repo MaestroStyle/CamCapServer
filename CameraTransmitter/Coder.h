@@ -12,7 +12,7 @@ class Coder : public QObject
 public:
     Coder();
 signals:
-    void encoded(QByteArray& data);
+    void encoded(QByteArray data);
 public slots:
     void encode(cv::Mat& frame);
 };

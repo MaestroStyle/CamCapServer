@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QGridLayout>
+#include <QThread>
 
 #include "CaptureManager.h"
 #include "CaptureEngine.h"
@@ -24,6 +25,8 @@ private:
     TransmitManager transmit_manager;
     Transmitter transmitter;
     Coder coder;
+
+    QThread thread_transmit;
 
     void closeEvent(QCloseEvent *event);
 

@@ -22,8 +22,19 @@ ReceiverManager::ReceiverManager(QWidget *parent) : QWidget(parent)
     stop_button.setText(QString("Stop"));
     stop_button.setDisabled(true);
 
+    command_address_lineedit.setText(hosts.value("command_address", "").toString());
+    command_port_lineedit.setText(hosts.value("command_port","").toString());
+    data_address_lineedit.setText(hosts.value("data_address","").toString());
+    data_port_lineedit.setText(hosts.value("data_port","").toString());
+
     QObject::connect(&start_button, &QPushButton::clicked, this, &ReceiverManager::start);
     QObject::connect(&stop_button, &QPushButton::clicked, this, &ReceiverManager::stop);
+}
+ReceiverManager::~ReceiverManager(){
+    hosts.setValue("command_address", command_address_lineedit.text());
+    hosts.setValue("command_port", command_port_lineedit.text());
+    hosts.setValue("data_address", data_address_lineedit.text());
+    hosts.setValue("data_port", data_port_lineedit.text());
 }
 void ReceiverManager::start(){
 //    command_address.setAddress(command_address_lineedit.text());
@@ -53,4 +64,7 @@ void ReceiverManager::error(){
     start_button.setDisabled(false);
     stop_button.setDisabled(true);
     process = false;
+}
+bool ReceiverManager::isProcess(){
+    return process;
 }
